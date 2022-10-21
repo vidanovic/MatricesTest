@@ -11,15 +11,6 @@ namespace HTF
     SquareMatrix::SquareMatrix(const std::size_t size) : m_size(size), m_Matrix(size, size)
     {}
 
-    SquareMatrix::SquareMatrix(const std::size_t tSize,
-                               const std::vector<Eigen::Triplet<double>> & tripletList) :
-        m_size(tSize),
-        m_Matrix(m_size, m_size)
-    {
-        m_Matrix.setFromTriplets(tripletList.begin(), tripletList.end());
-        m_size = m_Matrix.innerSize();
-    }
-
     SquareMatrix::SquareMatrix(const std::initializer_list<std::vector<double>> & tInput) :
         m_size(tInput.size()),
         m_Matrix(m_size, m_size)
@@ -86,50 +77,10 @@ namespace HTF
         m_Matrix.setZero();
     }
 
-    void SquareMatrix::setIdentity()
-    {
-        m_Matrix.setIdentity();
-    }
-
-    void SquareMatrix::setDiagonal(const std::vector<double> & tInput)
-    {
-        if(tInput.size() != m_size)
-        {
-            throw std::runtime_error("Matrix and vector must be same size.");
-        }
-        m_Matrix.setZero();
-
-        std::vector<Eigen::Triplet<double>> tripletList;
-        tripletList.reserve(m_size);
-        for(auto i = 0u; i < m_size; ++i)
-        {
-            tripletList.emplace_back(i, i, tInput[i]);
-        }
-        m_Matrix.setFromTriplets(tripletList.begin(), tripletList.end());
-    }
-
-    SquareMatrix SquareMatrix::addDiagonal(const std::vector<double> & tInput) const
-    {
-        SquareMatrix mat{*this};
-        SquareMatrix diag{m_size};
-        diag.setDiagonal(tInput);
-        return mat + diag;
-    }
-
-    SquareMatrix::SquareMatrix(Eigen::SparseMatrix<double> && tMatrix) :
+    SquareMatrix::SquareMatrix(Eigen::MatrixXd && tMatrix) :
         m_size(tMatrix.innerSize()),
         m_Matrix(tMatrix)
     {}
-
-    SquareMatrix SquareMatrix::inverse() const
-    {
-        Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
-        solver.compute(m_Matrix);
-        Eigen::SparseMatrix<double> I(m_size, m_size);
-        I.setIdentity();
-        const auto A_inv = solver.solve(I);
-        return SquareMatrix{A_inv};
-    }
 
     double SquareMatrix::operator()(const std::size_t i, const std::size_t j) const
     {
@@ -205,11 +156,6 @@ namespace HTF
         Eigen::VectorXd vec = Eigen::VectorXd::Map(first.data(), first.size());
         Eigen::VectorXd res = vec.transpose() * second.m_Matrix;
         return std::vector<double>(res.data(), res.data() + res.rows() * res.cols());
-    }
-
-    Eigen::SparseMatrix<double> SquareMatrix::getSparseMatrix() const
-    {
-        return m_Matrix;
     }
 
     std::vector<std::vector<double>> SquareMatrix::toVector() const
