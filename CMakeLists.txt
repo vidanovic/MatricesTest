@@ -6,6 +6,8 @@ set(target_name ${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_definitions(-DEIGEN_DONT_PARALLELIZE)
+
 # Include Eigen
 configure_file(CMakeListsEigen.txt.in ${CMAKE_BINARY_DIR}/eigen-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .

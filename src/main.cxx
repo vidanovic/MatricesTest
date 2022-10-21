@@ -40,7 +40,7 @@ void fillMatrix(HTF::SquareMatrix& matrix, int size)
 int main()
 {
     constexpr size_t size = 145u;
-    // Create SquareMatrix of size 145
+
     WCE::SquareMatrix matrix1(size);
     WCE::SquareMatrix matrix2(size);
 
